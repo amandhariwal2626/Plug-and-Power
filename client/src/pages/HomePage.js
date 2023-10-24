@@ -12,6 +12,14 @@ import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { Backdrop, Button, CircularProgress, FormControl, FormLabel, Grid, InputLabel, MenuItem, Paper, Select, Typography } from '@mui/material';
 
 const FLASK_BACKEND_URL = 'http://localhost:5000';
+
+const OPENCHARGEMAP_API_KEY=	'956ba160-4bad-444f-b5fd-da7d130dec89';
+const OPENCHARGEMAP_API_BASE_URL = 'https://api.openchargemap.io/v3/poi/';
+const OPENCHARGEMAP_API_REFERENCE_DATA_URL = 'https://api.openchargemap.io/v3/referencedata';
+const latitude = 12.9141 ;
+const longitude = 74.8560 ;
+const max_results = 100;
+
 let DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -80,7 +88,8 @@ function HomePage() {
     setOpen(true);
     async function fetchChargingStation() {
       try {
-        const response = await axios.get(`${FLASK_BACKEND_URL}/charging-stations`);
+        // const response = await axios.get(`${FLASK_BACKEND_URL}/charging-stations`);
+        const response = await axios.get(`${OPENCHARGEMAP_API_BASE_URL}?latitude=${latitude}&longitude=${longitude}&distance=2000&maxresults=${max_results}&compact=true&verbose=false&key=${OPENCHARGEMAP_API_KEY}`)
         if (response.status === 200) {
           setOpen(false);
         }
@@ -93,49 +102,67 @@ function HomePage() {
   }, []);
 
   useEffect(() => {
-    async function fetchCountries() {
-      try {
-        const response = await axios.get(`${FLASK_BACKEND_URL}/countries`);
-        if (response.status === 200) {
-          const options = response.data;
-          setCountries(options);
-        }
-      } catch (error) {
-        console.error('Error fetching filter options:', error);
-      }
-    }
-    fetchCountries();
-  }, []);
+    async function getReferenceData(){
+      try{
+        const response = await axios.get (`${OPENCHARGEMAP_API_REFERENCE_DATA_URL}?key=${OPENCHARGEMAP_API_KEY}`)
+        if(response.status === 200){
+          console.log(response.data);
+          setCountries(response.data.Countries);
+          setUsage(response.data.UsageTypes);
+          setConnectionType(response.data.ConnectionTypes);
+          
 
-  useEffect(() => {
-    async function fetchUsage() {
-      try {
-        const response = await axios.get(`${FLASK_BACKEND_URL}/usage-types`);
-        if (response.status === 200) {
-          const options = response.data;
-          setUsage(options);
         }
-      } catch (error) {
-        console.error('Error fetching filter options:', error);
+      }catch(error){
+        console.error("Error fetching reference data", error);
       }
     }
-    fetchUsage();
-  }, []);
+    getReferenceData();
+  },[]);
+  // useEffect(() => {
+  //   async function fetchCountries() {
+  //     try {
+  //       // const response = await axios.get(`${FLASK_BACKEND_URL}/countries`);
+  //       if (response.status === 200) {
+  //         const options = response.data.Countries;
+  //         setCountries(options);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching filter options:', error);
+  //     }
+  //   }
+  //   fetchCountries();
+  // }, []);
 
-  useEffect(() => {
-    async function fetchConnectionType() {
-      try {
-        const response = await axios.get(`${FLASK_BACKEND_URL}/connection-types`);
-        if (response.status === 200) {
-          const options = response.data;
-          setConnectionType(options);
-        }
-      } catch (error) {
-        console.error('Error fetching filter options:', error);
-      }
-    }
-    fetchConnectionType();
-  }, []);
+  // useEffect(() => {
+  //   async function fetchUsage() {
+  //     try {
+  //       const response = await axios.get(`${FLASK_BACKEND_URL}/usage-types`);
+  //       if (response.status === 200) {
+  //         const options = response.data;
+  //         setUsage(options);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching filter options:', error);
+  //     }
+  //   }
+  //   fetchUsage();
+  // }, []);
+
+  // useEffect(() => {
+  //   async function fetchConnectionType() {
+  //     try {
+  //       const response = await axios.get(`${FLASK_BACKEND_URL}/connection-types`);
+  //       if (response.status === 200) {
+  //         const options = response.data;
+  //         setConnectionType(options);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching filter options:', error);
+  //     }
+  //   }
+  //   fetchConnectionType();
+  // }, []);
 
   const handleMapClick = () => {
     setShowDetails(false); // Hide the interface when clicking on the map
@@ -246,7 +273,7 @@ function HomePage() {
               {countries.map((country) => (
                 
                 <MenuItem key={country.ID} value={country.ID}>
-                  {country.TITLE}
+                  {country.Title}
                 </MenuItem>
               ))}
             </Select>
@@ -263,8 +290,8 @@ function HomePage() {
             >
               <MenuItem value="All">All</MenuItem>
               {usage.map((usage) => (
-                <MenuItem key={usage.ID} value={usage.TITLE}>
-                  {usage.TITLE}
+                <MenuItem key={usage.ID} value={usage.Title}>
+                  {usage.Title}
                 </MenuItem>
               ))}
             </Select>
@@ -299,8 +326,8 @@ function HomePage() {
             >
               <MenuItem value="All">All</MenuItem>
               {ConnectionType.map((type) => (
-                <MenuItem key={type.ID} value={type.TITLE}>
-                  {type.TITLE}
+                <MenuItem key={type.ID} value={type.Title}>
+                  {type.Title}
                   {/* {console.log(type.Title)} */}
                 </MenuItem>
               ))}
