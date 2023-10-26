@@ -378,7 +378,9 @@ def fetch_and_update_data_route():
 def fetch_charging_stations(latitude, longitude, max_results=100):
     url = f"{OPENCHARGEMAP_API_BASE_URL}?latitude={latitude}&longitude={longitude}&distance=2000&maxresults={max_results}&compact=true&verbose=false&key={OPENCHARGEMAP_API_KEY}"
     response= requests.get(url)
-    return response.json()
+    # return response.json()
+    print(response)
+    return jsonify(response)
 
 @app.route('/charging-stations')
 def charging_stations():

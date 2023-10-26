@@ -18,7 +18,7 @@ const OPENCHARGEMAP_API_BASE_URL = 'https://api.openchargemap.io/v3/poi/';
 const OPENCHARGEMAP_API_REFERENCE_DATA_URL = 'https://api.openchargemap.io/v3/referencedata';
 const latitude = 12.9141 ;
 const longitude = 74.8560 ;
-const max_results = 100;
+const max_results = 10000;
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -90,6 +90,7 @@ function HomePage() {
       try {
         // const response = await axios.get(`${FLASK_BACKEND_URL}/charging-stations`);
         const response = await axios.get(`${OPENCHARGEMAP_API_BASE_URL}?latitude=${latitude}&longitude=${longitude}&distance=2000&maxresults=${max_results}&compact=true&verbose=false&key=${OPENCHARGEMAP_API_KEY}`)
+        // const response = await axios.get(`${OPENCHARGEMAP_API_BASE_URL}?key=${OPENCHARGEMAP_API_KEY}`)
         if (response.status === 200) {
           setOpen(false);
         }
@@ -106,7 +107,7 @@ function HomePage() {
       try{
         const response = await axios.get (`${OPENCHARGEMAP_API_REFERENCE_DATA_URL}?key=${OPENCHARGEMAP_API_KEY}`)
         if(response.status === 200){
-          console.log(response.data);
+          // console.log(response.data);
           setCountries(response.data.Countries);
           setUsage(response.data.UsageTypes);
           setConnectionType(response.data.ConnectionTypes);
@@ -460,6 +461,18 @@ function HomePage() {
     </Typography>
     {/* Include equipment details here */}
     {/* {console.log(selectedStation)} */}
+    {console.log(selectedStation)}
+    <Typography>Number Of Stations/Bays: {selectedStation.NumberOfPoints}</Typography>
+    {ConnectionType.map((connType)=>(
+      
+      connType.ID===selectedStation.Connections[0].ConnectionTypeID?<>
+      {console.log(connType)}
+      
+      <Typography>Connection Type :{connType.FormalName}, {connType.Title}</Typography>
+      </>:null
+    )
+    )}
+    {/* <Typography>Connection Type: </Typography> */}
   </Paper>
 
   {/* Usage Restrictions Card */}
@@ -468,7 +481,7 @@ function HomePage() {
       Usage Restrictions
     </Typography>
     {filterOptions.Usage.map((usage) => (
-usage.ID === selectedStation.UsageTypeID ? (
+usage.ID === selectedStation.UsageTypeID ? ( 
 <>
   <Typography marginLeft={2} variant='body2' key={usage.ID}>
     Usage Type: 
