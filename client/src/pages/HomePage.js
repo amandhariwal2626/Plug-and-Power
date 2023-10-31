@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Image } from 'mui-image'
+import { SvgIcon } from '@mui/material';
 import 'leaflet/dist/leaflet.css';
 
 // import DetailedView from './components/DetailedView';
@@ -9,7 +11,7 @@ import 'leaflet-routing-machine';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import { Backdrop, Button, CircularProgress, FormControl, FormLabel, Grid, InputLabel, MenuItem, Paper, Select, Typography } from '@mui/material';
+import { Avatar, Backdrop, Box, Button, CircularProgress, FormControl, FormLabel, Grid, InputLabel, MenuItem, Paper, Select, Typography } from '@mui/material';
 
 const FLASK_BACKEND_URL = 'http://localhost:5000';
 
@@ -462,12 +464,12 @@ function HomePage() {
     {/* Include equipment details here */}
     {/* {console.log(selectedStation)} */}
     {console.log(selectedStation)}
+    <SvgIcon ></SvgIcon>
     <Typography>Number Of Stations/Bays: {selectedStation.NumberOfPoints}</Typography>
     {ConnectionType.map((connType)=>(
       
       connType.ID===selectedStation.Connections[0].ConnectionTypeID?<>
       {console.log(connType)}
-      
       <Typography>Connection Type :{connType.FormalName}, {connType.Title}</Typography>
       </>:null
     )
